@@ -1,0 +1,25 @@
+services:
+  telegram-anime-cms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-anime-cms
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_OWNER_IDS=${BOT_OWNER_IDS}
+      - DEFAULT_TIMEZONE=Asia/Kolkata
+      - TELEGRAM_WEBHOOK_URL=${TELEGRAM_WEBHOOK_URL:-}
+      - TELEGRAM_WEBHOOK_SECRET=${TELEGRAM_WEBHOOK_SECRET:-}
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

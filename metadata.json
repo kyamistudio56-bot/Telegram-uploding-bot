@@ -1,0 +1,6 @@
+{
+  "name": "Telegram Anime Poster & Episode CMS",
+  "description": "Production-ready Telegram Anime Poster & Episode CMS bot with permanent channel links, multiple episode ranges, movie posting, persistent scheduler, Post Now, and multi-owner authorization.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
