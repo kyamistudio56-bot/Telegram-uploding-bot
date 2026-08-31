@@ -1,21 +1,28 @@
-# Multi-stage production Dockerfile
+# ==========================================
+# Stage 1: Build
+# ==========================================
 FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy package descriptors
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+# npm install is used because the repository
+# does not currently contain package-lock.json
+RUN npm install
 
-# Copy source files
+# Copy project source
 COPY . .
 
-# Build Vite frontend and bundled CommonJS server
+# Build frontend + backend
 RUN npm run build
 
-# Production runner stage
+
+# ==========================================
+# Stage 2: Production
+# ==========================================
 FROM node:22-alpine AS runner
 
 WORKDIR /app
@@ -23,19 +30,23 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Install production dependencies only
+# Copy package files
 COPY package*.json ./
-RUN npm ci --omit=dev
 
-# Copy compiled build artifacts
+# Install production dependencies
+RUN npm install --omit=dev
+
+# Copy compiled application
 COPY --from=builder /app/dist ./dist
+
+# Copy data directory if it exists
 COPY --from=builder /app/data ./data
 
-# Expose production port
+# Render uses this port
 EXPOSE 3000
 
-# Persistent volume for JSON database
+# Data directory
 VOLUME ["/app/data"]
 
-# Start production server
+# Start application
 CMD ["node", "dist/server.cjs"]
